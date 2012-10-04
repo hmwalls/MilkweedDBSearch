@@ -1,0 +1,18 @@
+SET FOREIGN_KEY_CHECKS=0;
+TRUNCATE plants;
+SET FOREIGN_KEY_CHECKS=1;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 5.5/data/milkweed/plants.csv'
+INTO TABLE plants
+FIELDS TERMINATED BY ',';
+SET FOREIGN_KEY_CHECKS=0;
+TRUNCATE sources;
+SET FOREIGN_KEY_CHECKS=1;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 5.5/data/milkweed/sources.csv'
+INTO TABLE sources
+FIELDS TERMINATED BY ',';
+SET FOREIGN_KEY_CHECKS=0;
+TRUNCATE availability;
+SET FOREIGN_KEY_CHECKS=1;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 5.5/data/milkweed/availability.csv'
+INTO TABLE availability
+FIELDS TERMINATED BY ',';
