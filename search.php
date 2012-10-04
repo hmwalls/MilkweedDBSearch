@@ -17,21 +17,21 @@
   if(preg_match("/^[  a-zA-Z]+/", $_POST['name'])){
   $name=$_POST['name'];
   //connect  to the database
-  $db=mysql_connect  ("servername", "username",  "password") or die ('I cannot connect to the database  because: ' . mysql_error());
+  $db=mysql_connect  ("localhost", "hailey",  "b0Mbu$") or die ('I cannot connect to the database  because: ' . mysql_error());
   //-select  the database to use
-  $mydb=mysql_select_db("yourDatabase");
+  $mydb=mysql_select_db("milkweed");
   //-query  the database table
-  $sql="SELECT  ID, FirstName, LastName FROM Contacts WHERE FirstName LIKE '%" . $name .  "%' OR LastName LIKE '%" . $name ."%'";
+  $sql="Select Commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant FROM availability JOIN plants ON availability.plant_ID = plants.plant_ID Join sources ON availability.source_ID = sources.source_ID;";
   //-run  the query against the mysql query function
   $result=mysql_query($sql);
   //-create  while loop and loop through result set
   while($row=mysql_fetch_array($result)){
-          $FirstName  =$row['FirstName'];
-          $LastName=$row['LastName'];
-          $ID=$row['ID'];
+          $Commonname  =$row['Commonname'];
+          $scientificname=$row['scientificname'];
+          $name=$row['name'];
   //-display the result of the array
   echo "<ul>\n";
-  echo "<li>" . "<a  href=\"search.php?id=$ID\">"   .$FirstName . " " . $LastName .  "</a></li>\n";
+  echo "<li>" . "<a  href=\"search.php?id=$ID\">"   .$Commonname . " " . $scientificname .  "</a></li>\n";
   echo "</ul>";
   }
   }
