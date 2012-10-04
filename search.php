@@ -29,10 +29,19 @@
           $Commonname  =$row['Commonname'];
           $scientificname=$row['scientificname'];
           $name=$row['name'];
+          $databasecode=$row['databasecode'];
+          $state=$row['state'];
+          $zip=$row['zip'];
+          $url=$row['url'];
+          $email=$row['email'];
+          $phone=$row['phone'];
+          $notes=$row['notes'];
+          $seed=$row['seed'];
+          $liveplant=$row['liveplant'];
   //-display the result of the array
-  echo "<ul>\n";
-  echo "<li>" . "<a  href=\"search.php?id=$ID\">"   .$Commonname . " " . $scientificname .  "</a></li>\n";
-  echo "</ul>";
+  echo "<table border=1>\n";
+  echo "<tr> <td> $liveplant </td> <td> $seed </td> <td> $Commonname </td> <td> $scientificname </td> <td> $databasecode </td> <td> $name </td> <td> $state </td> <td> $zip </td> <td> $url </td> <td> $email </td> <td> $phone </td> <td> $notes </td> </tr>\n";
+  echo "</table>";
   }
   }
   else{
