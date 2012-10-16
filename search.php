@@ -74,18 +74,42 @@
       $scientificnameentry = $_POST['scientificnameentry'];
       $stateentry = $_POST['stateentry'];
       $zipentry = $_POST['zipcodeentry'];
-      $seedentry = $_POST['seedentry'];
-      $liveplantentry = $_POST['liveplantentry'];
+
       if (isset($_POST['submit'])){
         if(isset($_GET['go'])){
-          if(preg_match("/^[a-zA-Z0-9]+/", $_POST['databasecodeentry'])){
-          $db=mysql_connect  ("localhost", "hailey",  "b0Mbu$") or die ('I cannot connect to the database  because: ' . mysql_error());
 
-          $mydb=mysql_select_db("milkweed");
+          $mysqli = new mysqli('localhost', 'hailey', 'b0Mbu$', 'milkweed');
 
-          $sql="Select commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant FROM availability JOIN plants ON availability.plant_ID = plants.plant_ID Join sources ON availability.source_ID = sources.source_ID WHERE state like '$stateentry%' AND databasecode like '$databasecodeentry%' AND commonname like '$commonnameentry%' AND scientificname like '$scientificnameentry%' AND zip like '$zipcodeentry%'";
+          // $query="SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant 
+          // FROM availability 
+          // JOIN plants 
+          // ON availability.plant_ID = plants.plant_ID 
+          // JOIN sources 
+          // ON availability.source_ID = sources.source_ID 
+          // WHERE state LIKE '$stateentry%' 
+          // AND databasecode LIKE '$databasecodeentry%' 
+          // AND commonname LIKE '$commonnameentry%' 
+          // AND scientificname LIKE '$scientificnameentry%' 
+          // AND zip LIKE'$zipentry%'";
 
-          $result=mysql_query($sql);
+          $stmt = mysqli_prepare($mysqli,"SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant 
+          FROM availability 
+          JOIN plants 
+          ON availability.plant_ID = plants.plant_ID 
+          JOIN sources 
+          ON availability.source_ID = sources.source_ID 
+          WHERE state LIKE '? %' 
+          AND databasecode LIKE '? %' 
+          AND commonname LIKE '? %' 
+          AND scientificname LIKE '? %' 
+          AND zip LIKE'? %'");
+
+          $stmt->bind_param('s', 's', 's', 's', 's', $stateentry, $databasecodeentry, $commonnameentry, $scientificnameentry, $zipentry);
+
+          $stmt->execute();
+
+          $result=$stmt->get_result();
+
             echo "<table border=1 width=80%>
               <tr width=80%> 
               <th width=8.3%> Live Plants Available? </th>
@@ -101,7 +125,7 @@
               <th width=8.3%> Phone </th>
               <th width=8.3%> Notes </th>
               </tr>\n";
-            while($row=mysql_fetch_array($result)){
+            while($row = $result->fetch_assoc()){
                       $commonname=$row['commonname'];
                       $scientificname=$row['scientificname'];
                       $name=$row['name'];
@@ -114,7 +138,6 @@
                       $notes=$row['notes'];
                       $seed=$row['seed'];
                       $liveplant=$row['liveplant'];
-              
               echo "
               <tr width=80%>
               <td width=8.3%> $liveplant </td> 
@@ -132,17 +155,11 @@
               </tr>\n";
             }
             echo "</table>";
+            
           }       
-        }
-
-        echo "Database Code = $databasecodeentry <br>";
-        echo "Common Name = $commonnameentry <br>";
-        echo "Scientific Name = $scientificnameentry <br>";
-        echo "State = $stateentry <br>";
-        echo "Zip Code = $zipentry <br>";
-        echo "Seeds = $seedentry <br>";
-        echo "Live Plants = $liveplantentry <br>";
     }      
+    print_r(error_get_last());
+    printf("Errormessage: %s\n", $mysqli->error);
     ?>
   </body>
 
