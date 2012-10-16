@@ -1,16 +1,16 @@
 <html>
   <head>
-    <meta  http-equiv="Content-Type" content="text/html;  charset=iso-8859-1">
-    <title>Search  Contacts</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Search Contacts</title>
   </head>
 
   <body>
     <h3>Search For Native Milkweed</h3>
-    <form  method="post" action="search.php?go"  id="searchform"> <br>
-      Plant Database Code: <input  type="text" name="databasecodeentry"><br>
-      Common Name: <input  type="text" name="commonnameentry"><br>
-      Scientific Name: <input  type="text" name="scientificnameentry"><br>
-      ZIP Code: <input  type="text" name="zipcodeentry"><br>
+    <form method="post" action="search.php?go" id="searchform"> <br>
+      Plant Database Code: <input type="text" name="databasecodeentry"><br>
+      Common Name: <input type="text" name="commonnameentry"><br>
+      Scientific Name: <input type="text" name="scientificnameentry"><br>
+      ZIP Code: <input type="text" name="zipcodeentry"><br>
       State: <select name="stateentry">
         <option value="">Any State</option>
         <option value="AL">Alabama</option>
@@ -63,104 +63,56 @@
         <option value="WA">Washington</option>
         <option value="WV">West Virginia</option>
         <option value="WI">Wisconsin</option>
-        <option value="WY">Wyoming</option> 
+        <option value="WY">Wyoming</option>
       </select> <br>
-      <input  type="submit" name="submit" value="Search">
+      <input type="submit" name="submit" value="Search">
     </form>
 
     <?php
-      $databasecodeentry = $_POST['databasecodeentry'];  
+      $databasecodeentry = $_POST['databasecodeentry'];
       $commonnameentry = $_POST['commonnameentry'];
       $scientificnameentry = $_POST['scientificnameentry'];
       $stateentry = $_POST['stateentry'];
       $zipentry = $_POST['zipcodeentry'];
+      $seedentry = $_POST['seedentry'];
+      $liveplantentry = $_POST['liveplantentry'];
+
+      $databasecodeentry = "'$databasecodeentry%'";
+      $commonnameentry = "'$commonnameentry%'";
+      $scientificnameentry = "'$scientificnameentry%'";
+      $stateentry = "'$stateentry%'";
+      $zipentry = "'$zipentry%'";
+      $seedentry = '$seedentry%';
+      $liveplantentry = "'$liveplantentry%'";
 
       if (isset($_POST['submit'])){
         if(isset($_GET['go'])){
-
-          $mysqli = new mysqli('localhost', 'hailey', 'b0Mbu$', 'milkweed');
-
-          // $query="SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant 
-          // FROM availability 
-          // JOIN plants 
-          // ON availability.plant_ID = plants.plant_ID 
-          // JOIN sources 
-          // ON availability.source_ID = sources.source_ID 
-          // WHERE state LIKE '$stateentry%' 
-          // AND databasecode LIKE '$databasecodeentry%' 
-          // AND commonname LIKE '$commonnameentry%' 
-          // AND scientificname LIKE '$scientificnameentry%' 
-          // AND zip LIKE'$zipentry%'";
-
-          $stmt = mysqli_prepare($mysqli,"SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant 
+          $pdo = new PDO('mysql:host=localhost;dbname=milkweed','hailey','b0Mbu$');
+          $sql = "SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant 
           FROM availability 
           JOIN plants 
           ON availability.plant_ID = plants.plant_ID 
           JOIN sources 
           ON availability.source_ID = sources.source_ID 
-          WHERE state LIKE '? %' 
-          AND databasecode LIKE '? %' 
-          AND commonname LIKE '? %' 
-          AND scientificname LIKE '? %' 
-          AND zip LIKE'? %'");
-
-          $stmt->bind_param('s', 's', 's', 's', 's', $stateentry, $databasecodeentry, $commonnameentry, $scientificnameentry, $zipentry);
-
+          WHERE state LIKE :stateentry
+          AND databasecode LIKE :databasecodeentry
+          AND commonname LIKE :commoannameentry
+          AND scientificname LIKE :scientificnameentry
+          AND zip LIKE :zipentry";
+          $stmt = $pdo->prepare($sql);
+          $stmt->bindParam(":stateentry", $stateentry);
+          $stmt->bindParam(":databasecodeentry", $databasecodeentry);
+          $stmt->bindParam(":commonnameentry", $commonnameentry);
+          $stmt->bindParam(":scientificnameentry", $scientificnameentry);
+          $stmt->bindParam(":zipentry", $zipentry);
           $stmt->execute();
-
-          $result=$stmt->get_result();
-
-            echo "<table border=1 width=80%>
-              <tr width=80%> 
-              <th width=8.3%> Live Plants Available? </th>
-              <th width=8.3%> Seeds Available? </th>
-              <th width=8.3%> Common Name </th>
-              <th width=8.3%> Scientific Name </th>
-              <th width=8.3%> Plant Database Code </th>
-              <th width=8.3%> Source Name </th>
-              <th width=8.3%> State </th>
-              <th width=8.3%> ZIP </th>
-              <th width=8.3%> URL </th>
-              <th width=8.3%> Email </th>
-              <th width=8.3%> Phone </th>
-              <th width=8.3%> Notes </th>
-              </tr>\n";
-            while($row = $result->fetch_assoc()){
-                      $commonname=$row['commonname'];
-                      $scientificname=$row['scientificname'];
-                      $name=$row['name'];
-                      $databasecode=$row['databasecode'];
-                      $state=$row['state'];
-                      $zip=$row['zip'];
-                      $url=$row['url'];
-                      $email=$row['email'];
-                      $phone=$row['phone'];
-                      $notes=$row['notes'];
-                      $seed=$row['seed'];
-                      $liveplant=$row['liveplant'];
-              echo "
-              <tr width=80%>
-              <td width=8.3%> $liveplant </td> 
-              <td width=8.3%> $seed </td> 
-              <td width=8.3%> $commonname </td> 
-              <td width=8.3%> $scientificname </td> 
-              <td width=8.3%> $databasecode </td> 
-              <td width=8.3%> $name </td> 
-              <td width=8.3%> $state </td> 
-              <td width=8.3%> $zip </td> 
-              <td width=8.3%> $url </td> 
-              <td width=8.3%> $email </td> 
-              <td width=8.3%> $phone </td> 
-              <td width=8.3%> $notes </td> 
-              </tr>\n";
-            }
-            echo "</table>";
-            
-          }       
-    }      
-    print_r(error_get_last());
-    printf("Errormessage: %s\n", $mysqli->error);
+          while($row = $stmt->fetch()){
+            print_r($row);
+            echo"stuff";
+          }
+        }
+    }
     ?>
-  </body>
+</body>
 
 </html>
