@@ -7,11 +7,32 @@
   <body>
     <h3>Search For Native Milkweed</h3>
     <form method="post" action="search.php?go" id="searchform"> <br>
-      Plant Database Code: <input type="text" name="databasecodeentry"><br>
-      Common Name: <input type="text" name="commonnameentry"><br>
-      Scientific Name: <input type="text" name="scientificnameentry"><br>
-      ZIP Code: <input type="text" name="zipcodeentry"><br>
-      State: <select name="stateentry">
+      
+        Plant Species: <select name="databasecodeentry">
+        <option value="">Any Species</option>
+        <option value="ASTU">Butterfly Milkweed (Asclepias tuberosa)</option>
+        <option value="ASSY">Common Milkweed (Asclepias syriaca)</option>
+        <option value="ASVI2">Green Antelopehorn (Asclepias viridis)</option>
+        <option value="ASHA">Hall's Milkweed (Asclepias hallii)</option>
+        <option value="ASCO">Heartleaf Milkweed (Asclepias cordifolia)</option>
+        <option value="ASFA">Mexican Whorled Milkweed (Asclepias fascicularis)</option>
+        <option value="ASOV">Oval Leaf Milkweed (Asclepias ovalifolia)</option>
+        <option value="ASHU3">Pinewoods Milkweed (Asclepias humistrata)</option>
+        <option value="ASPU">Plains Milkweed (Asclepias pumila)</option>
+        <option value="ASEX">Poke Milkweed (Asclepias exaltata)</option>
+        <option value="ASSU3">Prairie Milkweed (Asclepias sullivantii)</option>
+        <option value="ASPU2">Purple Milkweed (Asclepias purpurascens)</option>
+        <option value="ASRU">Red Milkweed (Asclepias rubra)</option>
+        <option value="ASVI">Short Green Milkweed (Asclepias viridiflora)</option>
+        <option value="ASSP">Showy Milkweed (Asclepias speciosa)</option>
+        <option value="ASIN">Swamp Milkweed (Asclepias incarnata)</option>
+        <option value="ASHI">Tall Green Milkweed (Asclepias hirtella)</option>
+        <option value="ASTE">Texas Milkweed (Asclepias texana)</option>
+        <option value="ASAM">Wavy Leaved Milkweed (Asclepias amplexicaulis)</option>
+        <option value="ASAL">Whitestem Milkweed (Asclepias albicans)</option>
+        <option value="ASVE">Whorled Milkweed (Asclepias verticillata)</option>
+        </select><br>
+        State: <select name="stateentry">
         <option value="">Any State</option>
         <option value="AL">Alabama</option>
         <option value="AK">Alaska</option>
@@ -95,20 +116,16 @@
           AND zip LIKE '$zipentry%'";
 
           $result=mysql_query($sql);
-            echo "<table border=1 width=80%>
-                  <tr width=80%>
-                  <th width=8.3%> Live Plants Available? </th>
-                  <th width=8.3%> Seeds Available? </th>
-                  <th width=8.3%> Common Name </th>
-                  <th width=8.3%> Scientific Name </th>
-                  <th width=8.3%> Plant Database Code </th>
-                  <th width=8.3%> Source Name </th>
-                  <th width=8.3%> State </th>
-                  <th width=8.3%> ZIP </th>
-                  <th width=8.3%> URL </th>
-                  <th width=8.3%> Email </th>
-                  <th width=8.3%> Phone </th>
-                  <th width=8.3%> Notes </th>
+            echo "<table border=1 width=90%>
+                  <tr width=90%>
+                  <th width=10%> Plant Species </th>
+                  <th width=10%> Vendor Name </th>
+                  <th width=10%> State </th>
+                  <th width=10%> ZIP </th>
+                  <th width=10%> URL </th>
+                  <th width=10%> Email </th>
+                  <th width=10%> Phone </th>
+                  <th width=10%> Notes </th>
                   </tr>\n";
             while($row=mysql_fetch_array($result)){
                       $commonname=$row['commonname'];
@@ -125,19 +142,15 @@
                       $liveplant=$row['liveplant'];
               
               echo "
-                  <tr width=80%>
-                  <td width=8.3%> $liveplant </td>
-                  <td width=8.3%> $seed </td>
-                  <td width=8.3%> $commonname </td>
-                  <td width=8.3%> $scientificname </td>
-                  <td width=8.3%> $databasecode </td>
-                  <td width=8.3%> $name </td>
-                  <td width=8.3%> $state </td>
-                  <td width=8.3%> $zip </td>
-                  <td width=8.3%> $url </td>
-                  <td width=8.3%> $email </td>
-                  <td width=8.3%> $phone </td>
-                  <td width=8.3%> $notes </td>
+                  <tr width=90%>
+                  <td width=10%> $commonname ($scientificname) </td>
+                  <td width=10%> $name </td>
+                  <td width=10%> $state </td>
+                  <td width=10%> $zip </td>
+                  <td width=10%> $url </td>
+                  <td width=10%> $email </td>
+                  <td width=10%> $phone </td>
+                  <td width=10%> $notes </td>
                   </tr>\n";
             }
             echo "</table>";
