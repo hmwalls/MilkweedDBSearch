@@ -110,48 +110,53 @@
           JOIN sources 
           ON availability.source_ID = sources.source_ID 
           WHERE state LIKE '$stateentry%' 
-          AND databasecode LIKE '$databasecodeentry%' 
-          AND commonname LIKE '$commonnameentry%' 
-          AND scientificname LIKE '$scientificnameentry%' 
-          AND zip LIKE '$zipentry%'";
+          AND databasecode LIKE '$databasecodeentry%'";
 
           $result=mysql_query($sql);
-            echo "<table border=1 width=90%>
-                  <tr width=90%>
-                  <th width=10%> Plant Species </th>
-                  <th width=10%> Vendor Name </th>
-                  <th width=10%> State </th>
-                  <th width=10%> ZIP </th>
-                  <th width=10%> URL </th>
-                  <th width=10%> Email </th>
-                  <th width=10%> Phone </th>
-                  <th width=10%> Notes </th>
-                  </tr>\n";
+            // echo "<table border=1 width=90%>
+            //       <tr width=90%>
+            //       <th width=10%> Plant Species </th>
+            //       <th width=10%> Vendor Name </th>
+            //       <th width=10%> State </th>
+            //       <th width=10%> ZIP </th>
+            //       <th width=10%> URL </th>
+            //       <th width=10%> Email </th>
+            //       <th width=10%> Phone </th>
+            //       <th width=10%> Notes </th>
+            //       </tr>\n";
+            $n=0;
             while($row=mysql_fetch_array($result)){
-                      $commonname=$row['commonname'];
-                      $scientificname=$row['scientificname'];
-                      $name=$row['name'];
-                      $databasecode=$row['databasecode'];
-                      $state=$row['state'];
-                      $zip=$row['zip'];
-                      $url=$row['url'];
-                      $email=$row['email'];
-                      $phone=$row['phone'];
-                      $notes=$row['notes'];
-                      $seed=$row['seed'];
-                      $liveplant=$row['liveplant'];
+                      $commonname[]=$row['commonname'];
+                      $scientificname[]=$row['scientificname'];
+                      $name[]=$row['name'];
+                      $databasecode[]=$row['databasecode'];
+                      $state[]=$row['state'];
+                      $zip[]=$row['zip'];
+                      $url[]=$row['url'];
+                      $email[]=$row['email'];
+                      $phone[]=$row['phone'];
+                      $notes[]=$row['notes'];
+                      $seed[]=$row['seed'];
+                      $liveplant[]=$row['liveplant'];
               
+              // echo "
+              //     <tr width=90%>
+              //     <td width=10%> $commonname ($scientificname) </td>
+              //     <td width=10%> $name </td>
+              //     <td width=10%> $state </td>
+              //     <td width=10%> $zip </td>
+              //     <td width=10%> $url </td>
+              //     <td width=10%> $email </td>
+              //     <td width=10%> $phone </td>
+              //     <td width=10%> $notes </td>
+              //     </tr>\n";
               echo "
-                  <tr width=90%>
-                  <td width=10%> $commonname ($scientificname) </td>
-                  <td width=10%> $name </td>
-                  <td width=10%> $state </td>
-                  <td width=10%> $zip </td>
-                  <td width=10%> $url </td>
-                  <td width=10%> $email </td>
-                  <td width=10%> $phone </td>
-                  <td width=10%> $notes </td>
-                  </tr>\n";
+              <td><p><strong> $commonname[$n] </strong> (<i>$scientificname[$n]</i>)<br>
+              $name[$n], $state[$n]<br>
+              $url[$n], $email[$n], $phone[$n]<br>
+              $notes[$n]</p></td>
+              ";
+              $n=$n+1;
             }
             echo "</table>";
         }
