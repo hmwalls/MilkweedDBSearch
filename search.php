@@ -6,8 +6,7 @@
 
   <body>
     <h3>Search For Native Milkweed</h3>
-    <form method="post" action="search.php?go" id="searchform"> <br>
-      
+    <form method="post" action="search.php" id="searchform"> <br>
         Plant Species: <select name="databasecodeentry">
         <option value="">Any Species</option>
         <option value="ASTU">Butterfly Milkweed (Asclepias tuberosa)</option>
@@ -86,82 +85,51 @@
         <option value="WI">Wisconsin</option>
         <option value="WY">Wyoming</option>
       </select> <br>
-      <input type="submit" name="submit" value="Search">
+      <input type="submit" name="submit_button" value="Search">
     </form>
+<table>
+  <?php
+  if (isset($_POST['submit_button'])){
+    $databasecodeentry = $_POST['databasecodeentry'];
+    $stateentry = $_POST['stateentry'];
+    $dbuser = 'hailey';
+    $dbpassword = "b0Mbu$";
 
-    <?php
-      $databasecodeentry = $_POST['databasecodeentry'];
-      $commonnameentry = $_POST['commonnameentry'];
-      $scientificnameentry = $_POST['scientificnameentry'];
-      $stateentry = $_POST['stateentry'];
-      $zipentry = $_POST['zipcodeentry'];
-      $seedentry = $_POST['seedentry'];
-      $liveplantentry = $_POST['liveplantentry'];
-      if (isset($_POST['submit'])){
-        if(isset($_GET['go'])){
-          $db=mysql_connect ("localhost", "hailey", "b0Mbu$") or die ('I cannot connect to the database because: ' . mysql_error());
-
-          $mydb=mysql_select_db("milkweed");
-
-          $sql="SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant 
-          FROM availability 
-          JOIN plants 
-          ON availability.plant_ID = plants.plant_ID 
-          JOIN sources 
-          ON availability.source_ID = sources.source_ID 
-          WHERE state LIKE '$stateentry%' 
-          AND databasecode LIKE '$databasecodeentry%'";
-
-          $result=mysql_query($sql);
-            // echo "<table border=1 width=90%>
-            //       <tr width=90%>
-            //       <th width=10%> Plant Species </th>
-            //       <th width=10%> Vendor Name </th>
-            //       <th width=10%> State </th>
-            //       <th width=10%> ZIP </th>
-            //       <th width=10%> URL </th>
-            //       <th width=10%> Email </th>
-            //       <th width=10%> Phone </th>
-            //       <th width=10%> Notes </th>
-            //       </tr>\n";
-            $n=0;
-            while($row=mysql_fetch_array($result)){
-                      $commonname[]=$row['commonname'];
-                      $scientificname[]=$row['scientificname'];
-                      $name[]=$row['name'];
-                      $databasecode[]=$row['databasecode'];
-                      $state[]=$row['state'];
-                      $zip[]=$row['zip'];
-                      $url[]=$row['url'];
-                      $email[]=$row['email'];
-                      $phone[]=$row['phone'];
-                      $notes[]=$row['notes'];
-                      $seed[]=$row['seed'];
-                      $liveplant[]=$row['liveplant'];
-              
-              // echo "
-              //     <tr width=90%>
-              //     <td width=10%> $commonname ($scientificname) </td>
-              //     <td width=10%> $name </td>
-              //     <td width=10%> $state </td>
-              //     <td width=10%> $zip </td>
-              //     <td width=10%> $url </td>
-              //     <td width=10%> $email </td>
-              //     <td width=10%> $phone </td>
-              //     <td width=10%> $notes </td>
-              //     </tr>\n";
-              echo "
-              <td><p><strong> $commonname[$n] </strong> (<i>$scientificname[$n]</i>)<br>
-              $name[$n], $state[$n]<br>
-              $url[$n], $email[$n], $phone[$n]<br>
-              $notes[$n]</p></td>
-              ";
-              $n=$n+1;
-            }
-            echo "</table>";
-        }
+    try {
+      $pdo = new PDO('mysql:dbname=milkweed;host=localhost', $dbuser, $dbpassword);
     }
-    ?>
+    catch (PDOException $e) {
+      die ('data fails');
+    }
+
+    $base_query = "SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant FROM availability JOIN plants ON availability.plant_ID = plants.plant_ID JOIN sources ON availability.source_ID = sources.source_ID";
+    $query = $base_query . " WHERE state LIKE CONCAT(:stateentry, '%') AND databasecode LIKE CONCAT(:databasecodeentry, '%')";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(array(':stateentry' => $stateentry, ':databasecodeentry' => $databasecodeentry));
+
+    foreach ($stmt as $row) {
+      $commonname=$row['commonname'];
+      $scientificname=$row['scientificname'];
+      $name=$row['name'];
+      $databasecode=$row['databasecode'];
+      $state=$row['state'];
+      $zip=$row['zip'];
+      $url=$row['url'];
+      $email=$row['email'];
+      $phone=$row['phone'];
+      $notes=$row['notes'];
+      $seed=$row['seed'];
+      $liveplant=$row['liveplant'];
+      echo "
+      <tr><td><p><strong> $commonname </strong> (<i>$scientificname</i>)<br>
+      $name, $state<br>
+      $url, $email, $phone<br>
+      $notes</p></td></tr>
+      ";
+    }
+  }
+  ?>
+  </table>
 </body>
 
 </html>
