@@ -1,3 +1,31 @@
+<?php
+$dbuser = 'hailey';
+$dbpassword = "b0Mbu$";
+
+try {
+  $pdo = new PDO('mysql:dbname=milkweed;host=localhost', $dbuser, $dbpassword);
+}
+catch (PDOException $e) {
+  die ('data fails');
+}
+
+$plant_query = "select databasecode, commonname, scientificname from plants;";
+$stmt = $pdo->prepare($plant_query);
+
+if (!$stmt->execute()) {
+  print_r($stmt->errorInfo());
+}
+
+$plants = array();
+foreach ($stmt as $row) {
+  array_push($plants, array(
+    'databasecode' => $row['databasecode'], 
+    'commonname' => $row['commonname'],
+    'scientificname' => $row['scientificname']
+    ));
+}
+
+?>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
@@ -9,27 +37,13 @@
     <form method="post" action="search.php" id="searchform"> <br>
         Plant Species: <select name="databasecodeentry">
         <option value="">Any Species</option>
-        <option value="ASTU">Butterfly Milkweed (Asclepias tuberosa)</option>
-        <option value="ASSY">Common Milkweed (Asclepias syriaca)</option>
-        <option value="ASVI2">Green Antelopehorn (Asclepias viridis)</option>
-        <option value="ASHA">Hall's Milkweed (Asclepias hallii)</option>
-        <option value="ASCO">Heartleaf Milkweed (Asclepias cordifolia)</option>
-        <option value="ASFA">Mexican Whorled Milkweed (Asclepias fascicularis)</option>
-        <option value="ASOV">Oval Leaf Milkweed (Asclepias ovalifolia)</option>
-        <option value="ASHU3">Pinewoods Milkweed (Asclepias humistrata)</option>
-        <option value="ASPU">Plains Milkweed (Asclepias pumila)</option>
-        <option value="ASEX">Poke Milkweed (Asclepias exaltata)</option>
-        <option value="ASSU3">Prairie Milkweed (Asclepias sullivantii)</option>
-        <option value="ASPU2">Purple Milkweed (Asclepias purpurascens)</option>
-        <option value="ASRU">Red Milkweed (Asclepias rubra)</option>
-        <option value="ASVI">Short Green Milkweed (Asclepias viridiflora)</option>
-        <option value="ASSP">Showy Milkweed (Asclepias speciosa)</option>
-        <option value="ASIN">Swamp Milkweed (Asclepias incarnata)</option>
-        <option value="ASHI">Tall Green Milkweed (Asclepias hirtella)</option>
-        <option value="ASTE">Texas Milkweed (Asclepias texana)</option>
-        <option value="ASAM">Wavy Leaved Milkweed (Asclepias amplexicaulis)</option>
-        <option value="ASAL">Whitestem Milkweed (Asclepias albicans)</option>
-        <option value="ASVE">Whorled Milkweed (Asclepias verticillata)</option>
+        <?php
+        foreach ($plants as $plant) {
+          ?>
+          <option value="<?php echo $plant['databasecode']; ?>"><?php echo $plant['commonname']; ?> (<?php echo $plant['scientificname']; ?>)</option>
+          <?php
+        }
+        ?>
         </select><br>
         State: <select name="stateentry">
         <option value="">Any State</option>
@@ -92,17 +106,7 @@
   if (isset($_POST['submit_button'])){
     $databasecodeentry = $_POST['databasecodeentry'];
     $stateentry = $_POST['stateentry'];
-    $dbuser = 'hailey';
-    $dbpassword = "b0Mbu$";
-
-    try {
-      $pdo = new PDO('mysql:dbname=milkweed;host=localhost', $dbuser, $dbpassword);
-    }
-    catch (PDOException $e) {
-      die ('data fails');
-    }
-
-
+   
     $subquery = "
     (select 
       sources.source_ID,
