@@ -102,29 +102,67 @@
       die ('data fails');
     }
 
-    $base_query = "SELECT commonname, scientificname, databasecode, name, state, zip, url, email, phone, notes, seed, liveplant FROM availability JOIN plants ON availability.plant_ID = plants.plant_ID JOIN sources ON availability.source_ID = sources.source_ID";
-    $query = $base_query . " WHERE state LIKE CONCAT(:stateentry, '%') AND databasecode LIKE CONCAT(:databasecodeentry, '%')";
+
+    $subquery = "
+    (select 
+      sources.source_ID,
+      GROUP_CONCAT(plants.databasecode SEPARATOR '|') as codes_avail 
+    from 
+      sources join 
+      availability on sources.source_ID = availability.source_ID 
+      join plants on availability.plant_ID = plants.plant_ID 
+    group by sources.source_ID)
+    ";
+
+    $query = "
+    SELECT 
+      GROUP_CONCAT(CONCAT('<b>', plants.commonname, '</b> (<i>', plants.scientificname, '</i>)') SEPARATOR '<br/>') as plant_html,
+      sources.name, 
+      sources.state, 
+      sources.zip, 
+      sources.url, 
+      sources.email, 
+      sources.phone, 
+      sources.notes 
+    FROM 
+      " . $subquery . " as avail 
+      JOIN sources ON avail.source_ID = sources.source_ID 
+      JOIN availability on availability.source_ID = avail.source_ID 
+      JOIN plants ON availability.plant_ID = plants.plant_ID 
+    WHERE 
+      sources.state LIKE CONCAT(:stateentry, '%') AND 
+      avail.codes_avail LIKE CONCAT('%', :databasecodeentry, '%') 
+    GROUP BY sources.source_ID";
     $stmt = $pdo->prepare($query);
-    $stmt->execute(array(':stateentry' => $stateentry, ':databasecodeentry' => $databasecodeentry));
+
+    if (!$stmt->execute(array(':stateentry' => $stateentry, ':databasecodeentry' => $databasecodeentry))) {
+      print_r($stmt->errorInfo());
+    }
 
     foreach ($stmt as $row) {
-      $commonname=$row['commonname'];
-      $scientificname=$row['scientificname'];
+
+      $plant_html=$row['plant_html'];
       $name=$row['name'];
-      $databasecode=$row['databasecode'];
       $state=$row['state'];
       $zip=$row['zip'];
       $url=$row['url'];
       $email=$row['email'];
       $phone=$row['phone'];
       $notes=$row['notes'];
-      $seed=$row['seed'];
-      $liveplant=$row['liveplant'];
       echo "
-      <tr><td><p><strong> $commonname </strong> (<i>$scientificname</i>)<br>
-      $name, $state<br>
-      $url, $email, $phone<br>
-      $notes</p></td></tr>
+      <tr><td><p>
+      <h3><a href=\"url\"> $name, $state</a></h3>
+      $email<br> 
+      $phone<br>
+      <br>
+      Milkweed Species Available:
+      <br>
+
+      $plant_html<br>
+      <br>
+
+      $notes
+      </p></td></tr>
       ";
     }
   }
