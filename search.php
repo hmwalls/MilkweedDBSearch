@@ -19,7 +19,7 @@ if (!$stmt->execute()) {
 $plants = array();
 foreach ($stmt as $row) {
   array_push($plants, array(
-    'databasecode' => $row['databasecode'], 
+    'databasecode' => trim($row['databasecode']), 
     'commonname' => $row['commonname'],
     'scientificname' => $row['scientificname']
     ));
@@ -40,7 +40,7 @@ foreach ($stmt as $row) {
         <?php
         foreach ($plants as $plant) {
           ?>
-          <option value="<?php echo $plant['databasecode']; ?>"><?php echo $plant['commonname']; ?> (<?php echo $plant['scientificname']; ?>)</option>
+          <option value="<?php echo $plant['databasecode']; ?>"><?php print $plant['commonname']; ?> (<?php echo $plant['scientificname']; ?>)</option>
           <?php
         }
         ?>
