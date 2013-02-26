@@ -155,7 +155,7 @@ foreach ($stmt as $row) {
       $notes=$row['notes'];
       echo "
       <tr><td><p>
-      <h3><a href=\"url\"> $name, $state</a></h3>
+      <h3><a href=\"$url\"> $name, $state</a></h3>
       $email<br> 
       $phone<br>
       <br>
