@@ -136,7 +136,8 @@ foreach ($stmt as $row) {
     WHERE 
       sources.state LIKE CONCAT(:stateentry, '%') AND 
       avail.codes_avail LIKE CONCAT('%', :databasecodeentry, '%') 
-    GROUP BY sources.source_ID";
+    GROUP BY sources.source_ID
+    ORDER BY sources.name";
     $stmt = $pdo->prepare($query);
 
     if (!$stmt->execute(array(':stateentry' => $stateentry, ':databasecodeentry' => $databasecodeentry))) {
@@ -153,11 +154,24 @@ foreach ($stmt as $row) {
       $email=$row['email'];
       $phone=$row['phone'];
       $notes=$row['notes'];
+
+      $email = trim($email);
+
+      if ($email) {
+        $email = $email . "<br>";
+      }
+
+      $phone = trim($phone);
+
+      if ($phone) {
+        $phone = $phone . "<br>";
+      }
+
       echo "
       <tr><td><p>
       <h3><a href=\"$url\"> $name, $state</a></h3>
-      $email<br> 
-      $phone<br>
+      $email
+      $phone
       <br>
       Milkweed Species Available:
       <br>
