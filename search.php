@@ -33,7 +33,7 @@ foreach ($stmt as $row) {
   </head>
 
   <body>
-    <h3>Search For Native Milkweed</h3>
+    <h3>Search For Native Milkweed Seed</h3>
     <form method="post" action="search.php" id="searchform"> <br>
         Plant Species: <select name="databasecodeentry">
         <option value="">Any Species</option>
@@ -144,6 +144,8 @@ foreach ($stmt as $row) {
       print_r($stmt->errorInfo());
     }
 
+      echo " Showing results for $stateentry and $databasecodeentry ";
+
     foreach ($stmt as $row) {
 
       $plant_html=$row['plant_html'];
@@ -167,13 +169,18 @@ foreach ($stmt as $row) {
         $phone = $phone . "<br>";
       }
 
+      if ($url) {
+        $url2 = $url . "<br>";
+      }
+
       echo "
       <tr><td><p>
-      <h3><a href=\"$url\"> $name, $state</a></h3>
-      $email
+      <h3><a target = '_blank' href=\"$url\"> $name, $state</a></h3>
       $phone
+      $email
+      $url2
       <br>
-      Milkweed Species Available:
+      Available Species:
       <br>
 
       $plant_html<br>
