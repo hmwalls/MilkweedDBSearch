@@ -105,9 +105,102 @@ foreach ($stmt as $row) {
   <?php
 
   if (isset($_POST['submit_button'])){
-    $databasecodeentry = $_POST['databasecodeentry'];
-    $stateentry = $_POST['stateentry'];
-   
+
+    $terms = array();
+
+    if (isset($_POST['databasecodeentry'])) {
+      $databasecodeentry = $_POST['databasecodeentry'];
+
+      $plantnameshow = "
+          SELECT
+            GROUP_CONCAT(CONCAT('<b>', plants.commonname, '</b> (<i>', plants.scientificname, '</i>)') SEPARATOR '<br/>') as plant_html
+          FROM
+            plants
+          WHERE
+            plants.databasecode = :databasecodeentry
+          ";
+      $stmt2 = $pdo->prepare($plantnameshow);
+
+      echo "dbce = " . $databasecodeentry;
+      if (!$stmt2->execute(array(':databasecodeentry' => $databasecodeentry))) {
+        print_r($stmt->errorInfo());
+      }
+      else {
+        if ($stmt2->rowCount() > 0) {
+          $bs=  $stmt2->fetch(PDO::FETCH_ASSOC);
+          print_r($bs);
+          array_push($terms, $bs['plant_html']);
+        }   
+        else {
+          array_push($terms, "Any species");
+        }     
+      }
+    }
+
+    if (isset($_POST['stateentry'])) {
+      $stateentry = $_POST['stateentry'];
+      echo "state entry = " . $stateentry;
+
+      $statename = array (
+      'AL'=>'Alabama',
+      'AK'=>'Alaska',
+      'AZ'=>'Arizona',
+      'AR'=>'Arkansas',
+      'CA'=>'California',
+      'CO'=>'Colorado',
+      'CT'=>'Connecticut',
+      'DE'=>'Delaware',
+      'DC'=>'District of Columbia',
+      'FL'=>'Florida',
+      'GA'=>'Georgia',
+      'HI'=>'Hawaii',
+      'ID'=>'Idaho',
+      'IL'=>'Illinois',
+      'IN'=>'Indiana',
+      'IA'=>'Iowa',
+      'KS'=>'Kansas',
+      'KY'=>'Kentucky',
+      'LA'=>'Louisiana',
+      'ME'=>'Maine',
+      'MD'=>'Maryland',
+      'MA'=>'Massachusetts',
+      'MI'=>'Michigan',
+      'MN'=>'Minnesota',
+      'MS'=>'Mississippi',
+      'MO'=>'Missouri',
+      'MT'=>'Montana',
+      'NE'=>'Nebraska',
+      'NV'=>'Nevada',
+      'NH'=>'New Hampshire',
+      'NJ'=>'New Jersey',
+      'NM'=>'New Mexico',
+      'NY'=>'New York',
+      'NC'=>'North Carolina',
+      'ND'=>'North Dakota',
+      'OH'=>'Ohio',
+      'OK'=>'Oklahoma',
+      'OR'=>'Oregon',
+      'PA'=>'Pennsylvania',
+      'RI'=>'Rhode Island',
+      'SC'=>'South Carolina',
+      'SD'=>'South Dakota',
+      'TN'=>'Tennessee',
+      'TX'=>'Texas',
+      'UT'=>'Utah',
+      'VT'=>'Vermont',
+      'VA'=>'Virginia',
+      'WA'=>'Washington',
+      'WV'=>'West Virginia',
+      'WI'=>'Wisconsin',
+      'WY'=>'Wyoming',);
+
+      if (isset($statename[$stateentry])) {
+        array_push($terms, $statename[$stateentry]);
+      }
+      else
+        array_push($terms, "any state");
+    }
+
     $subquery = "
     (select 
       sources.source_ID,
@@ -145,105 +238,60 @@ foreach ($stmt as $row) {
       print_r($stmt->errorInfo());
     }
 
-$statename = array (
-    'AL'=>'Alabama',
-    'AK'=>'Alaska',
-    'AZ'=>'Arizona',
-    'AR'=>'Arkansas',
-    'CA'=>'California',
-    'CO'=>'Colorado',
-    'CT'=>'Connecticut',
-    'DE'=>'Delaware',
-    'DC'=>'District of Columbia',
-    'FL'=>'Florida',
-    'GA'=>'Georgia',
-    'HI'=>'Hawaii',
-    'ID'=>'Idaho',
-    'IL'=>'Illinois',
-    'IN'=>'Indiana',
-    'IA'=>'Iowa',
-    'KS'=>'Kansas',
-    'KY'=>'Kentucky',
-    'LA'=>'Louisiana',
-    'ME'=>'Maine',
-    'MD'=>'Maryland',
-    'MA'=>'Massachusetts',
-    'MI'=>'Michigan',
-    'MN'=>'Minnesota',
-    'MS'=>'Mississippi',
-    'MO'=>'Missouri',
-    'MT'=>'Montana',
-    'NE'=>'Nebraska',
-    'NV'=>'Nevada',
-    'NH'=>'New Hampshire',
-    'NJ'=>'New Jersey',
-    'NM'=>'New Mexico',
-    'NY'=>'New York',
-    'NC'=>'North Carolina',
-    'ND'=>'North Dakota',
-    'OH'=>'Ohio',
-    'OK'=>'Oklahoma',
-    'OR'=>'Oregon',
-    'PA'=>'Pennsylvania',
-    'RI'=>'Rhode Island',
-    'SC'=>'South Carolina',
-    'SD'=>'South Dakota',
-    'TN'=>'Tennessee',
-    'TX'=>'Texas',
-    'UT'=>'Utah',
-    'VT'=>'Vermont',
-    'VA'=>'Virginia',
-    'WA'=>'Washington',
-    'WV'=>'West Virginia',
-    'WI'=>'Wisconsin',
-    'WY'=>'Wyoming',
-  );
+    $search_terms = implode(" and ", $terms);
 
-    echo "Showing results for $statename[$stateentry] and ";
-
-    foreach ($stmt as $row) {
-
-      $plant_html=$row['plant_html'];
-      $name=$row['name'];
-      $state=$row['state'];
-      $zip=$row['zip'];
-      $url=$row['url'];
-      $email=$row['email'];
-      $phone=$row['phone'];
-      $notes=$row['notes'];
-
-      $email = trim($email);
-
-      if ($email) {
-        $email = $email . "<br>";
+    if ($stmt->rowCount() > 0) {
+      if (count($terms)) {
+        echo "Results for " . $search_terms;
       }
 
-      $phone = trim($phone);
+      foreach ($stmt as $row) {
 
-      if ($phone) {
-        $phone = $phone . "<br>";
+        $plant_html=$row['plant_html'];
+        $name=$row['name'];
+        $state=$row['state'];
+        $zip=$row['zip'];
+        $url=$row['url'];
+        $email=$row['email'];
+        $phone=$row['phone'];
+        $notes=$row['notes'];
+
+        $email = trim($email);
+
+        if ($email) {
+          $email = $email . "<br>";
+        }
+
+        $phone = trim($phone);
+
+        if ($phone) {
+          $phone = $phone . "<br>";
+        }
+
+        if ($url) {
+          $url2 = $url . "<br>";
+        }
+
+        echo "
+        <tr><td><p>
+        <h3><a target = '_blank' href=\"$url\"> $name, $state</a></h3>
+        $phone
+        $email
+        $url2
+        <br>
+        Available Species:
+        <br>
+
+        $plant_html<br>
+        <br>
+
+        $notes
+        </p></td></tr>
+        ";
       }
-
-      if ($url) {
-        $url2 = $url . "<br>";
-      }
-
-      echo "
-      <tr><td><p>
-      <h3><a target = '_blank' href=\"$url\"> $name, $state</a></h3>
-      $phone
-      $email
-      $url2
-      <br>
-      Available Species:
-      <br>
-
-      $plant_html<br>
-      <br>
-
-      $notes
-      </p></td></tr>
-      ";
+    }
+    else {
+      echo "No results found for " . $search_terms;
     }
   }
   ?>
