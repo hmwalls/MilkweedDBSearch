@@ -9,7 +9,7 @@ catch (PDOException $e) {
   die ('data fails');
 }
 
-$plant_query = "select databasecode, commonname, scientificname from plants;";
+$plant_query = "select databasecode, commonname, scientificname from plants WHERE plants.databasecode LIKE 'A%' ORDER BY plants.commonname;";
 $stmt = $pdo->prepare($plant_query);
 
 if (!$stmt->execute()) {
@@ -141,6 +141,8 @@ if (isset($_POST['submit_button'])){
       sources join 
       availability on sources.source_ID = availability.source_ID 
       join plants on availability.plant_ID = plants.plant_ID 
+    WHERE
+    availability.seed LIKE 'yes' 
     group by sources.source_ID)
     ";
 
@@ -161,7 +163,8 @@ if (isset($_POST['submit_button'])){
       JOIN plants ON availability.plant_ID = plants.plant_ID 
     WHERE 
       sources.state LIKE CONCAT(:stateentry, '%') AND 
-      avail.codes_avail LIKE CONCAT('%', :databasecodeentry, '%') 
+      avail.codes_avail LIKE CONCAT('%', :databasecodeentry, '%') AND
+      availability.seed LIKE 'yes' 
     GROUP BY sources.source_ID
     ORDER BY sources.name";
     $stmt = $pdo->prepare($query);
